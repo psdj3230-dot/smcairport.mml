@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simamamia International Hub v17.8</title>
+    <style>
+        html, body { height: 100%; margin: 0; background: #000; color: #eee; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .header { text-align: center; background: #111; border-bottom: 3px solid #fc0; padding: 10px 0; position: sticky; top: 0; z-index: 100; }
+        h1 { color: #fc0; font-size: 13px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; }
+        
+        .table-container { height: calc(100vh - 45px); overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        thead th { position: sticky; top: 0; background: #1a1a1a; color: #666; font-size: 9px; text-align: left; padding: 10px 8px; border-bottom: 2px solid #333; text-transform: uppercase; z-index: 10; }
+        td { padding: 12px 8px; border-bottom: 1px solid #161616; font-size: 12px; vertical-align: middle; }
+        
+        .col-time { width: 75px; }
+        .col-logo { width: 50px; text-align: center; }
+        .col-dest { width: auto; }
+        .col-flight { width: 85px; }
+        .col-status { width: 150px; }
+
+        .time { color: #0f0; font-family: monospace; font-size: 14px; font-weight: bold; display: block; }
+        .old-time { color: #555; text-decoration: line-through; font-size: 11px; display: block; font-family: monospace; }
+        .delayed-time { color: #f90; }
+        
+        .city { font-weight: bold; color: #fff; font-size: 13px; }
+        .country { color: #fc0; font-size: 9px; text-transform: uppercase; opacity: 0.8; display: block; }
+        
+        .airline-logo { max-width: 40px; max-height: 20px; object-fit: contain; }
+        .code { color: #aaa; font-family: monospace; font-size: 11px; background: #222; padding: 2px 4px; border-radius: 3px; border: 1px solid #333; }
+        
+        .status-msg { font-size: 10px; font-weight: bold; display: block; text-transform: uppercase; }
+        .sub-info { font-size: 9px; color: #0cf; display: block; margin-top: 2px; font-family: monospace; font-weight: bold; }
+        .term-tag { font-size: 8px; color: #555; display: block; margin-top: 1px; }
+        
+        .st-checkin { color: #0cf; }
+        .st-boarding { color: #f05; animation: blink 1.2s infinite; }
+        .st-delayed { color: #f90; }
+        .st-departed { color: #555; }
+        .st-closed { color: #777; }
+        .st-sched { color: #0f0; opacity: 0.6; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Simamamia-City International Airport Departures</h1>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th class="col-time">Time</th>
+                <th class="col-logo">Air</th>
+                <th class="col-dest">Destination</th>
+                <th class="col-flight">Flight</th>
+                <th class="col-status">Status / Info</th>
+            </tr>
+        </thead>
+        <tbody id="boardBody"></tbody>
+    </table>
+</div>
+
+<script>
+    function getVTime() {
+        var d = new Date();
+        var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+        return new Date(utc + (3600000 * 2)); 
+    }
+
+    const airlineData = {
+        "mimiAIR": { code: "ML", logo: "ML.PNG" },
+        "Zapadla Airlines": { code: "ZA", logo: "ZA.PNG" },
+        "Babischa Airlines": { code: "BH", logo: "BH.PNG" },
+        "Iziboeing": { code: "IZ", logo: "IZ.PNG" },
+        "GuestAIR": { code: "GA", logo: "GA.PNG" },
+        "AirPerni": { code: "PE", logo: "PE.PNG" },
+        "IceM": { code: "IC", logo: "IC.PNG" },
+        "Good Airlines": { code: "GD", logo: "GD.PNG" },
+        "GreenFly": { code: "GF", logo: "GF.PNG" },
+        "CatAir": { code: "CA", logo: "CA.PNG" },
+        "Nordström": { code: "ND", logo: "ND.PNG" },
+        "InstaFly": { code: "IF", logo: "IF.PNG" },
+        "KkanAIR": { code: "KA", logo: "KA.PNG" },
+        "VenusAir": { code: "VA", logo: "VA.PNG" },
+        "Maksimian Airlines": { code: "MK", logo: "MK.PNG" },
+        "JLS Airlines": { code: "JL", logo: "JL.PNG" },
+        "PegasAir": { code: "PA", logo: "PA.PNG" },
+        "ChocoFly": { code: "CF", logo: "CF.PNG" },
+        "MilkaAir": { code: "MA", logo: "MA.PNG" },
+        "DELTAPLANN": { code: "DP", logo: "DP.PNG" }
+    };
+
+    const logistics = {
+        "Laitzhar-Ola": { t: 1, g: ["A", "B"], gMax: [87, 76] },
+        "Mimiland": { t: 1, g: ["A", "B"], gMax: [87, 76] },
+        "Herland": { t: 2, g: ["C", "D"], gMax: [32, 80] },
+        "Maksimia": { t: 2, g: ["C", "D"], gMax: [32, 80] },
+        "Izikiland": { t: 3, g: ["E"], gMax: [28] },
+        "Goodland": { t: 4, g: ["F", "H"], gMax: [90, 20] },
+        "Funnyland": { t: 4, g: ["F", "H"], gMax: [90, 20] },
+        "Perni Kingdom": { t: 5, g: ["S", "J"], gMax: [20, 15] },
+        "Matrixland": { t: 5, g: ["S", "J"], gMax: [20, 15] },
+        "Green-Wedge": { t: 6, g: ["K"], gMax: [38] },
+        "Komaru Islands": { t: 6, g: ["K"], gMax: [38] },
+        "Emmaria": { t: 7, g: ["L"], gMax: [40] },
+        "Orphia": { t: 7, g: ["L"], gMax: [40] },
+        "Instaland": { t: 8, g: ["T"], gMax: [70] },
+        "Kangelland": { t: 9, g: ["Y", "Z", "Q", "O", "I"], gMax: [65, 70, 30, 34, 73] },
+        "Varland": { t: 9, g: ["Y", "Z", "Q", "O", "I"], gMax: [65, 70, 30, 34, 73] }
+    };
+
+    const destinations = [
+        { c: "Agyara", ctr: "Laitzhar-Ola", a: ["mimiAIR"], f: 120 },
+        { c: "Riholzhdeppa", ctr: "Laitzhar-Ola", a: ["Zapadla Airlines"], f: 180 },
+        { c: "Hjushzya", ctr: "Laitzhar-Ola", a: ["mimiAIR"], f: 200 },
+        { c: "Pomoykino", ctr: "Mimiland", a: ["mimiAIR"], f: 90 },
+        { c: "Bordel", ctr: "Mimiland", a: ["mimiAIR"], f: 110 },
+        { c: "Mimigrad", ctr: "Mimiland", a: ["GuestAIR"], f: 100 },
+        { c: "Prakh-Lenina", ctr: "Mimiland", a: ["mimiAIR"], f: 140 },
+        { c: "Pernito-s-Podlivito", ctr: "Mimiland", a: ["GuestAIR"], f: 150 },
+        { c: "Boyfriendsk", ctr: "Mimiland", a: ["mimiAIR"], f: 80 },
+        { c: "Inesbrazilinsk", ctr: "Mimiland", a: ["GuestAIR"], f: 160 },
+        { c: "Kozie-Shariki", ctr: "Mimiland", a: ["mimiAIR"], f: 180 },
+        { c: "Amstede", ctr: "Herland", a: ["Nordström"], f: 150 },
+        { c: "Eermelke", ctr: "Herland", a: ["JLS Airlines"], f: 180 },
+        { c: "Maksimlinn", ctr: "Maksimia", a: ["Maksimian Airlines"], f: 220 },
+        { c: "Wawanakwa", ctr: "Izikiland", a: ["Iziboeing"], f: 130 },
+        { c: "Flop Island", ctr: "Izikiland", a: ["GuestAIR"], f: 190 },
+        { c: "Versus", ctr: "Izikiland", a: ["Iziboeing"], f: 210 },
+        { c: "Goodgrad", ctr: "Goodland", a: ["Good Airlines"], f: 140 },
+        { c: "Memgrad", ctr: "Goodland", a: ["mimiAIR"], f: 160 },
+        { c: "Charmel", ctr: "Funnyland", a: ["PegasAir"], f: 110 },
+        { c: "PinkyLand", ctr: "Funnyland", a: ["ChocoFly"], f: 130 },
+        { c: "Jessie Jessie", ctr: "Funnyland", a: ["MilkaAir"], f: 140 },
+        { c: "Pernigrad", ctr: "Perni Kingdom", a: ["AirPerni"], f: 120 },
+        { c: "Dvizh Parizh", ctr: "Perni Kingdom", a: ["AirPerni"], f: 150 },
+        { c: "Binarion", ctr: "Matrixland", a: ["IceM"], f: 140 },
+        { c: "Ronda", ctr: "Matrixland", a: ["IceM"], f: 160 },
+        { c: "Huesosovo", ctr: "Matrixland", a: ["GuestAIR"], f: 180 },
+        { c: "Hamlovsk", ctr: "Matrixland", a: ["mimiAIR"], f: 200 },
+        { c: "Kumec", ctr: "Green-Wedge", a: ["GreenFly"], f: 180 },
+        { c: "Pikun", ctr: "Green-Wedge", a: ["GreenFly"], f: 240 },
+        { c: "Komurchiks", ctr: "Komaru Islands", a: ["CatAir"], f: 200 },
+        { c: "Komugigrad", ctr: "Komaru Islands", a: ["CatAir"], f: 220 },
+        { c: "Moodyaalia", ctr: "Emmaria", a: ["AirPerni"], f: 240 },
+        { c: "Puerto Pernito", ctr: "Emmaria", a: ["mimiAIR"], f: 260 },
+        { c: "Vinos", ctr: "Orphia", a: ["AirPerni"], f: 160 },
+        { c: "Phavorida", ctr: "Orphia", a: ["GuestAIR"], f: 220 },
+        { c: "Rozhena", ctr: "Orphia", a: ["mimiAIR"], f: 240 },
+        { c: "Brentala", ctr: "Instaland", a: ["InstaFly"], f: 180 },
+        { c: "Instalia", ctr: "Instaland", a: ["InstaFly"], f: 120 },
+        { c: "Joyride", ctr: "Kangelland", a: ["KkanAIR"], f: 160 },
+        { c: "Lavzar", ctr: "Kangelland", a: ["VenusAir"], f: 170 },
+        { c: "Quito", ctr: "Kangelland", a: ["mimiAIR"], f: 180 },
+        { c: "Bjorkpils", ctr: "Varland", a: ["DELTAPLANN"], f: 100 },
+        { c: "Justsirmais", ctr: "Varland", a: ["DELTAPLANN"], f: 120 },
+        { c: "Groncastle", ctr: "Varland", a: ["DELTAPLANN"], f: 140 }
+    ];
+
+    function render() {
+        const body = document.getElementById('boardBody');
+        const nowV = getVTime();
+        let flights = [];
+
+        for (let day = 0; day <= 1; day++) {
+            destinations.forEach((dest, dIdx) => {
+                for (let tMin = (dIdx * 13) % dest.f; tMin < 1440; tMin += dest.f) {
+                    let fTime = new Date(nowV);
+                    fTime.setDate(nowV.getDate() + day);
+                    fTime.setHours(0, tMin, 0, 0);
+
+                    const log = logistics[dest.ctr];
+                    const air = airlineData[dest.a[0]];
+                    
+                    const isDelayed = (tMin % 100 === 0);
+                    const delayMin = isDelayed ? 30 + (tMin % 40) : 0;
+                    
+                    const gTypeIdx = tMin % log.g.length;
+                    const gate = log.g[gTypeIdx] + ((tMin % log.gMax[gTypeIdx]) + 1).toString().padStart(2, '0');
+                    const cStart = (log.t * 100) + (dIdx % 90) + 1;
+
+                    flights.push({
+                        origTime: fTime,
+                        actualTime: new Date(fTime.getTime() + delayMin * 60000),
+                        city: dest.c, country: dest.ctr, logo: air.logo, 
+                        airCode: air.code,
+                        code: air.code + (200 + dIdx + (tMin % 50)),
+                        gate: gate, counters: `${cStart}-${cStart + 2}`, terminal: log.t, delay: delayMin
+                    });
+                }
+            });
+        }
+
+        flights.sort((a, b) => a.actualTime - b.actualTime);
+
+        let rows = "";
+        let count = 0;
+        flights.forEach(f => {
+            const diff = (f.actualTime - nowV) / 60000;
+            if (diff < -15 || count >= 150) return;
+            count++;
+            
+            const oh = f.origTime.getHours().toString().padStart(2,'0'), 
+                  om = f.origTime.getMinutes().toString().padStart(2,'0');
+            const ah = f.actualTime.getHours().toString().padStart(2,'0'), 
+                  am = f.actualTime.getMinutes().toString().padStart(2,'0');
+
+            let timeCell = (f.delay > 0) ? `<span class="old-time">${oh}:${om}</span><span class="time delayed-time">${ah}:${am}</span>` : `<span class="time">${oh}:${om}</span>`;
+            let statusHtml = "";
+
+            if (diff <= 0) {
+                statusHtml = `<span class="status-msg st-departed">Sent</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            } else if (diff <= 10) {
+                statusHtml = `<span class="status-msg st-closed">Boarding Closed</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            } else if (diff <= 40) {
+                statusHtml = `<span class="status-msg st-boarding">Boarding</span><span class="sub-info">GATE ${f.gate}</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            } else if (diff <= 60) {
+                statusHtml = `<span class="status-msg st-closed">Check-in Closed</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            } else if (diff <= 180) {
+                statusHtml = `<span class="status-msg st-checkin">Check-in</span><span class="sub-info">COUNTERS ${f.counters}</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            } else if (f.delay > 0) {
+                statusHtml = `<span class="status-msg st-delayed">Delayed</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            } else {
+                statusHtml = `<span class="status-msg st-sched">Scheduled</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
+            }
+
+            rows += `<tr>
+                <td class="col-time">${timeCell}</td>
+                <td class="col-logo"><img src="img/${f.logo}" class="airline-logo" onerror="this.style.opacity='0.2'"></td>
+                <td class="col-dest"><div class="city">${f.city}</div><span class="country">${f.country}</span></td>
+                <td class="col-flight"><span class="code">${f.code}</span></td>
+                <td class="col-status">${statusHtml}</td>
+            </tr>`;
+        });
+        body.innerHTML = rows;
+    }
+
+    render();
+    setInterval(render, 30000);
+</script>
+</body>
+</html>
