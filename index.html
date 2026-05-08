@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simamamia International Hub v17.8</title>
+    <title>Simamamia Mega-Hub v18.5 - FULL DATA</title>
     <style>
         html, body { height: 100%; margin: 0; background: #000; color: #eee; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .header { text-align: center; background: #111; border-bottom: 3px solid #fc0; padding: 10px 0; position: sticky; top: 0; z-index: 100; }
@@ -19,7 +19,7 @@
         .col-logo { width: 50px; text-align: center; }
         .col-dest { width: auto; }
         .col-flight { width: 85px; }
-        .col-status { width: 150px; }
+        .col-status { width: 155px; }
 
         .time { color: #0f0; font-family: monospace; font-size: 14px; font-weight: bold; display: block; }
         .old-time { color: #555; text-decoration: line-through; font-size: 11px; display: block; font-family: monospace; }
@@ -39,7 +39,6 @@
         .st-boarding { color: #f05; animation: blink 1.2s infinite; }
         .st-delayed { color: #f90; }
         .st-departed { color: #555; }
-        .st-closed { color: #777; }
         .st-sched { color: #0f0; opacity: 0.6; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
@@ -73,32 +72,34 @@
         return new Date(utc + (3600000 * 2)); 
     }
 
-   const airlineData = {
-    "mimiAIR": { code: "ML", logo: "img/AL.png" },
-    "Zapadla Airlines": { code: "ZA", logo: "img/ZA.png" },
-    "Babischa Airlines": { code: "BH", logo: "img/BH.png" },
-    "Iziboeing": { code: "IZ", logo: "img/IZ.png" },
-    "GuestAIR": { code: "GA", logo: "img/GA.png" },
-    "AirPerni": { code: "PE", logo: "img/PE.png" },
-    "IceM": { code: "IC", logo: "img/IC.png" },
-    "Good Airlines": { code: "GD", logo: "img/GD.png" },
-    "GreenFly": { code: "GF", logo: "img/GF.png" },
-    "CatAir": { code: "CA", logo: "img/CA.png" },
-    "Nordström": { code: "ND", logo: "img/ND.png" },
-    "Instafly": { code: "IF", logo: "img/IF.png" },
-    "KkanAIR": { code: "KA", logo: "img/KA.png" },
-    "VenusAir": { code: "VA", logo: "img/VA.png" },
-    "Maksimian Airlines": { code: "MK", logo: "img/MK.png" },
-    "JLS Airlines": { code: "JL", logo: "img/JL.png" },
-    "PegasAir": { code: "PA", logo: "img/PA.png" },
-    "Chocofly": { code: "CF", logo: "img/CF.png" },
-    "MilkaAir": { code: "MA", logo: "img/MA.png" },
-    "DELTAPLANN": { code: "DP", logo: "img/DP.png" }
-};
+    const airlineData = {
+        "mimiAIR": { code: "ML", logo: "img/ML.png" },
+        "Zapadla Airlines": { code: "ZA", logo: "img/ZA.png" },
+        "Babischa Airlines": { code: "BH", logo: "img/BH.png" },
+        "Iziboeing": { code: "IZ", logo: "img/IZ.png" },
+        "GuestAIR": { code: "GA", logo: "img/GA.png" },
+        "AirPerni": { code: "PE", logo: "img/PE.png" },
+        "IceM": { code: "IC", logo: "img/IC.png" },
+        "Good Airlines": { code: "GD", logo: "img/GD.png" },
+        "GreenFly": { code: "GF", logo: "img/GF.png" },
+        "CatAir": { code: "CA", logo: "img/CA.png" },
+        "Nordström": { code: "ND", logo: "img/ND.png" },
+        "InstaFly": { code: "IF", logo: "img/IF.png" },
+        "KkanAIR": { code: "KA", logo: "img/KA.png" },
+        "VenusAir": { code: "VA", logo: "img/VA.png" },
+        "Maksimian Airlines": { code: "MK", logo: "img/MK.png" },
+        "JLS Airlines": { code: "JL", logo: "img/JL.png" },
+        "PegasAir": { code: "PA", logo: "img/PA.png" },
+        "ChocoFly": { code: "CF", logo: "img/CF.png" },
+        "MilkaAir": { code: "MA", logo: "img/MA.png" },
+        "DELTAPLANN": { code: "DP", logo: "img/DP.png" },
+        "AliLines": { code: "AL", logo: "img/AL.png" }
+    };
 
     const logistics = {
         "Laitzhar-Ola": { t: 1, g: ["A", "B"], gMax: [87, 76] },
         "Mimiland": { t: 1, g: ["A", "B"], gMax: [87, 76] },
+        "Aliens": { t: 1, g: ["A", "B"], gMax: [87, 76] },
         "Herland": { t: 2, g: ["C", "D"], gMax: [32, 80] },
         "Maksimia": { t: 2, g: ["C", "D"], gMax: [32, 80] },
         "Izikiland": { t: 3, g: ["E"], gMax: [28] },
@@ -116,6 +117,7 @@
     };
 
     const destinations = [
+        // --- TERMINAL 1 (Laitzhar-Ola, Mimiland, Aliens) ---
         { c: "Agyara", ctr: "Laitzhar-Ola", a: ["mimiAIR"], f: 120 },
         { c: "Riholzhdeppa", ctr: "Laitzhar-Ola", a: ["Zapadla Airlines"], f: 180 },
         { c: "Hjushzya", ctr: "Laitzhar-Ola", a: ["mimiAIR"], f: 200 },
@@ -127,34 +129,59 @@
         { c: "Boyfriendsk", ctr: "Mimiland", a: ["mimiAIR"], f: 80 },
         { c: "Inesbrazilinsk", ctr: "Mimiland", a: ["GuestAIR"], f: 160 },
         { c: "Kozie-Shariki", ctr: "Mimiland", a: ["mimiAIR"], f: 180 },
+        { c: "Nibiru-City (NBC)", ctr: "Aliens", a: ["AliLines"], f: 180 },
+        { c: "Kraiden (KRD)", ctr: "Aliens", a: ["AliLines"], f: 210 },
+        { c: "Bordercity (BDC)", ctr: "Aliens", a: ["AliLines"], f: 150 },
+
+        // --- TERMINAL 2 (Herland, Maksimia) ---
         { c: "Amstede", ctr: "Herland", a: ["Nordström"], f: 150 },
         { c: "Eermelke", ctr: "Herland", a: ["JLS Airlines"], f: 180 },
         { c: "Maksimlinn", ctr: "Maksimia", a: ["Maksimian Airlines"], f: 220 },
+
+        // --- TERMINAL 3 (Izikiland) ---
         { c: "Wawanakwa", ctr: "Izikiland", a: ["Iziboeing"], f: 130 },
         { c: "Flop Island", ctr: "Izikiland", a: ["GuestAIR"], f: 190 },
         { c: "Versus", ctr: "Izikiland", a: ["Iziboeing"], f: 210 },
+
+        // --- TERMINAL 4 (Goodland, Funnyland) ---
         { c: "Goodgrad", ctr: "Goodland", a: ["Good Airlines"], f: 140 },
         { c: "Memgrad", ctr: "Goodland", a: ["mimiAIR"], f: 160 },
         { c: "Charmel", ctr: "Funnyland", a: ["PegasAir"], f: 110 },
         { c: "PinkyLand", ctr: "Funnyland", a: ["ChocoFly"], f: 130 },
         { c: "Jessie Jessie", ctr: "Funnyland", a: ["MilkaAir"], f: 140 },
+
+        // --- TERMINAL 5 (Perni Kingdom, Matrixland) ---
         { c: "Pernigrad", ctr: "Perni Kingdom", a: ["AirPerni"], f: 120 },
         { c: "Dvizh Parizh", ctr: "Perni Kingdom", a: ["AirPerni"], f: 150 },
         { c: "Binarion", ctr: "Matrixland", a: ["IceM"], f: 140 },
         { c: "Ronda", ctr: "Matrixland", a: ["IceM"], f: 160 },
         { c: "Huesosovo", ctr: "Matrixland", a: ["GuestAIR"], f: 180 },
         { c: "Hamlovsk", ctr: "Matrixland", a: ["mimiAIR"], f: 200 },
+
+        // --- TERMINAL 6 (Green-Wedge, Komaru Islands) ---
         { c: "Kumec", ctr: "Green-Wedge", a: ["GreenFly"], f: 180 },
         { c: "Pikun", ctr: "Green-Wedge", a: ["GreenFly"], f: 240 },
         { c: "Komurchiks", ctr: "Komaru Islands", a: ["CatAir"], f: 200 },
         { c: "Komugigrad", ctr: "Komaru Islands", a: ["CatAir"], f: 220 },
+
+        // --- TERMINAL 7 (Emmaria, Orphia) ---
         { c: "Moodyaalia", ctr: "Emmaria", a: ["AirPerni"], f: 240 },
         { c: "Puerto Pernito", ctr: "Emmaria", a: ["mimiAIR"], f: 260 },
         { c: "Vinos", ctr: "Orphia", a: ["AirPerni"], f: 160 },
         { c: "Phavorida", ctr: "Orphia", a: ["GuestAIR"], f: 220 },
         { c: "Rozhena", ctr: "Orphia", a: ["mimiAIR"], f: 240 },
+
+        // --- TERMINAL 8 (Instaland) ---
         { c: "Brentala", ctr: "Instaland", a: ["InstaFly"], f: 180 },
+        { c: "Lugassa", ctr: "Instaland", a: ["InstaFly"], f: 185 },
+        { c: "Sailoren", ctr: "Instaland", a: ["InstaFly"], f: 190 },
+        { c: "Oltaron", ctr: "Instaland", a: ["InstaFly"], f: 195 },
+        { c: "Credonia", ctr: "Instaland", a: ["InstaFly"], f: 200 },
+        { c: "Norcastel", ctr: "Instaland", a: ["InstaFly"], f: 205 },
         { c: "Instalia", ctr: "Instaland", a: ["InstaFly"], f: 120 },
+        { c: "Flumaria", ctr: "Instaland", a: ["InstaFly"], f: 210 },
+
+        // --- TERMINAL 9 (Kangelland, Varland) ---
         { c: "Joyride", ctr: "Kangelland", a: ["KkanAIR"], f: 160 },
         { c: "Lavzar", ctr: "Kangelland", a: ["VenusAir"], f: 170 },
         { c: "Quito", ctr: "Kangelland", a: ["mimiAIR"], f: 180 },
@@ -178,8 +205,8 @@
                     const log = logistics[dest.ctr];
                     const air = airlineData[dest.a[0]];
                     
-                    const isDelayed = (tMin % 100 === 0);
-                    const delayMin = isDelayed ? 30 + (tMin % 40) : 0;
+                    const isDelayed = (tMin % 95 === 0);
+                    const delayMin = isDelayed ? 35 : 0;
                     
                     const gTypeIdx = tMin % log.g.length;
                     const gate = log.g[gTypeIdx] + ((tMin % log.gMax[gTypeIdx]) + 1).toString().padStart(2, '0');
@@ -190,7 +217,7 @@
                         actualTime: new Date(fTime.getTime() + delayMin * 60000),
                         city: dest.c, country: dest.ctr, logo: air.logo, 
                         airCode: air.code,
-                        code: air.code + (200 + dIdx + (tMin % 50)),
+                        code: air.code + (500 + dIdx + (tMin % 70)),
                         gate: gate, counters: `${cStart}-${cStart + 2}`, terminal: log.t, delay: delayMin
                     });
                 }
@@ -216,12 +243,8 @@
 
             if (diff <= 0) {
                 statusHtml = `<span class="status-msg st-departed">Sent</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
-            } else if (diff <= 10) {
-                statusHtml = `<span class="status-msg st-closed">Boarding Closed</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
             } else if (diff <= 40) {
                 statusHtml = `<span class="status-msg st-boarding">Boarding</span><span class="sub-info">GATE ${f.gate}</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
-            } else if (diff <= 60) {
-                statusHtml = `<span class="status-msg st-closed">Check-in Closed</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
             } else if (diff <= 180) {
                 statusHtml = `<span class="status-msg st-checkin">Check-in</span><span class="sub-info">COUNTERS ${f.counters}</span><span class="term-tag">TERMINAL ${f.terminal}</span>`;
             } else if (f.delay > 0) {
@@ -232,7 +255,7 @@
 
             rows += `<tr>
                 <td class="col-time">${timeCell}</td>
-                <td class="col-logo"><img src="img/${f.logo}" class="airline-logo" onerror="this.style.opacity='0.2'"></td>
+                <td class="col-logo"><img src="${f.logo}" class="airline-logo" onerror="this.style.opacity='0'"></td>
                 <td class="col-dest"><div class="city">${f.city}</div><span class="country">${f.country}</span></td>
                 <td class="col-flight"><span class="code">${f.code}</span></td>
                 <td class="col-status">${statusHtml}</td>
